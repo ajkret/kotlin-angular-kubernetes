@@ -1,13 +1,11 @@
 package com.dersommer.todolist.services
 
 import com.dersommer.todolist.repositories.TaskRepository
-import com.dersommer.todolist.types.Task
-import com.dersommer.todolist.types.User
-import org.junit.jupiter.api.Assertions
+import com.dersommer.todolist.types.TaskData
+import com.dersommer.todolist.types.UserData
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -16,17 +14,17 @@ import java.util.stream.Collectors
 
 class TodoServiceTest {
 
-    private lateinit var user: User
-    private lateinit var completedTasks: List<Task>
+    private lateinit var user: UserData
+    private lateinit var completedTasks: List<TaskData>
     private lateinit var repo: TaskRepository
     private lateinit var service: TodoService
 
     @BeforeEach
     fun setUp() {
-        user = User(1, "test")
+        user = UserData(1, "test")
         completedTasks = listOf(
-            Task(1, "Test", LocalDate.now().plusDays(2), false, user),
-            Task(2, "Test 2", LocalDate.now().plusDays(1), true, user)
+            TaskData(1, "Test", LocalDate.now().plusDays(2), false, user),
+            TaskData(2, "Test 2", LocalDate.now().plusDays(1), true, user)
         )
 
         // Initialize mock for the Repository, that will be injected into Service

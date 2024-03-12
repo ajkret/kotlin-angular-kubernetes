@@ -1,8 +1,10 @@
 package com.dersommer.todolist.controllers
 
-import com.dersommer.todolist.entities.Task
 import com.dersommer.todolist.services.TodoService
+import com.dersommer.todolist.services.UserService
 import com.dersommer.todolist.types.TaskData
+import com.dersommer.todolist.types.UserData
+import org.apache.catalina.User
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,22 +15,20 @@ import java.util.stream.Collectors
 
 
 @RestController
-@RequestMapping("/todo")
-class TaskController(val service: TodoService) {
+@RequestMapping("/user")
+class UserController(val service: UserService) {
 
     @GetMapping
-    fun listAllUserTasks(
-        @RequestParam("id") userId: Int,
-        @RequestParam("completed") includeCompleted: Boolean = false
-    ): List<TaskData> {
-        return service.retrieveTasks(userId, includeCompleted)
+    fun listAllUserTasks(): List<UserData> {
+        return service
+            .listAllUsers()
             .stream()
-            .map { item -> TaskData(item.id, item.task, item.dueTo, item.completed, item.user?.id ?: 0) }
-            .collect(Collectors.toList())
+            .map { item -> UserData(item.id, item?.username ?: "") }
+            .collect(Collectors.toList());
     }
 
     @PostMapping
-    fun createTask(@RequestBody task: TaskData): Int {
-        return service.newTask(task)
+    fun createTask(@RequestBody user: UserData): Int {
+        return service.createUser(user).id ?: 0
     }
 }

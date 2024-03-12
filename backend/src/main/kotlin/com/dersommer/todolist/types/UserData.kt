@@ -7,15 +7,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
 
-@Entity
-@Table(indexes = [
-    Index(name="idx_user_username", unique = true, columnList = "username")]
-)
-class User(
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id:Int,
-
+class UserData(
+    val id:Int?,
     val username:String
 ) {
 }
