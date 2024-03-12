@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - preConditions:
+      - runningAs:
+          username: root
+  - include:
+      file: db/changelog/db.changelog-tables.yaml
+  - include:
+      file: db/changelog/db.changelog-user-username-index.yaml
+  - changeSet:
+      id: create-db-and-user
+      author: ajkret
+      changes:
+        - sql: CREATE USER 'todo_user' IDENTIFIED BY 'PASSWORD';
+        - sql: GRANT SELECT, INSERT, UPDATE, DELETE ON todo.* TO 'todo_user';
