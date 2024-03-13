@@ -1,7 +1,7 @@
 package com.dersommer.todolist.types
 
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDate
 
 data class TaskData(
@@ -10,6 +10,6 @@ data class TaskData(
     val task: String?,
     val dueTo: LocalDate? = null,
     val completed: Boolean? = false,
-    @field:NotEmpty(message = "User must be identified")
+    @field:NotNull(message = "User must be identified")
     val userId: Int?
 )
