@@ -3,6 +3,7 @@ package com.dersommer.todolist.controllers
 import com.dersommer.todolist.entities.Task
 import com.dersommer.todolist.services.TodoService
 import com.dersommer.todolist.types.TaskData
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -28,7 +29,7 @@ class TaskController(val service: TodoService) {
     }
 
     @PostMapping
-    fun createTask(@RequestBody task: TaskData): Int {
+    fun createTask(@RequestBody @Validated task: TaskData): Int {
         return service.newTask(task)
     }
 }
