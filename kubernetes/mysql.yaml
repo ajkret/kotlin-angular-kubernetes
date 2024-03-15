@@ -1,0 +1,60 @@
+# Mysql running as a POD. This scenario is not the recommended approach, usually
+# prefer a managed database, like RDS and create a Service of type "ExternalName"
+# Also, consider creating PersistentVolumes and mount the the volume for /data/mysql/data
+# to keep the data between deployments. In this case, spec.template.spec.volumes[].hostPath 
+# might need adjustment depending on the Kubernetes installation you are using (VMs) or Linux native
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-list-mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql-app
+  template:
+    metadata:
+      labels:
+        app: mysql-app
+    spec:
+      containers:
+        - name: mysql-app-container
+          image: mysql:8.0
+          args: ["--default-authentication-plugin=mysql_native_password"]
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: PASSWORD
+          resources:
+            limits:
+              # It does not behave well below 2G
+              memory: "2048Mi"
+              cpu: "1"
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /data/mysql/data
+              name: mysql-data
+            - mountPath: /docker-entrypoint-initdb.d
+              name: mysql-initdb
+      # Create a PersistentVolumeClaim in your Cloud Provider or use the todo-mysql-local-volume.yaml for
+      # Docker Desktop or Rancher Desktop, microk8s, minikube, k3s or kind.
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: todo-mysql-data-volume-claim
+        # Add your scripts for mysql initialization - docker-entrypoint-initdb.d
+        # maps directly to a folder in your machine 
+        - name: mysql-initdb
+          hostPath:
+            path: /mnt/d/kubernetes/todo-list/mysql/init
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-server
+spec:
+  selector:
+    app: mysql-app
+  ports:
+    - port: 3306
+      targetPort: 3306

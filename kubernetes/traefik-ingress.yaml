@@ -1,0 +1,70 @@
+# Check examples on how to configure NGinx Ingress here - https://github.com/nginxinc/kubernetes-ingress/tree/v3.4.2/examples
+# It is possible to add custom directives and check Authentication
+#
+# For this to work on Cognito redirect, the connection must be https. So, add the TLS manually (best approach)
+#
+#    kubectl create secret tls traefik-self-tls --key traefik.server.key --cert traefik.server.crt
+#
+# Check documentation on how to add a valid certificate in K8s
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-api-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - "/api"
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: api-ingress-route
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`traefik.todo.localdev.me`) && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: todo-list-svc
+          port: 80
+      middlewares:
+        - name: strip-api-prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: traefik-todo
+  annotations:
+    # In Traefik v2, the annotation "traefik.ingress.kubernetes.io/router.entrypoints" is used within
+    # Kubernetes Ingress resources to specify which entrypoints should be used by the router created
+    # for that Ingress. Entrypoints in Traefik are named ports that Traefik listens on for incoming
+    # traffic. This annotation allows you to define on which entrypoints (like HTTP or HTTPS) the Ingress
+    # rule should apply, effectively controlling how and where traffic is received by Traefik for that particular Ingress.
+    # web,websecure will make the Ingress accept http and https
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    name: strip-api-prefix
+spec:
+  rules:
+    - host: traefik.todo.localdev.me
+      http:
+        paths:
+          - pathType: Prefix
+            path: /api
+            backend:
+              service:
+                name: todo-list-svc
+                port:
+                  number: 80
+#          - pathType: Prefix
+#            path: /
+#            backend:
+#             service:
+#                name: tca-web
+#                port:
+#                  number: 80
+  tls:
+    - hosts:
+        - traefik.todo.localdev.me
+      secretName: todo-tls-secret

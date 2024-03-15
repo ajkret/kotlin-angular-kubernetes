@@ -1,0 +1,69 @@
+#
+# Create a volume for MYSQL - local-path means a volume in the Node, which is not recommended in Production
+# each Cloud Provider has its PersistentVolume implementation, which can be reached directly via 
+# PersistentVolumeClaim "storageClassName". Check options with:
+#
+#     kubectl get storageClass
+#
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: todo-mysql-local-volume
+  labels:
+    type: todo-mysql-local-volume
+spec:
+  capacity:
+    storage: 2001Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-path
+  local:
+    # Check your local Docker Desktop/Rancher Desktop VM or the absolute path visible for Kubernetes
+    # In this case, it is the mouted drive D: visible on rancher-data VM
+    # An alternative is use hostPath, which does not use PV an PVC
+    path: /mnt/d/kubernetes/todo-list/main
+  # nodeAffinity is required, unfortunatelly. There are a few options for this:
+  # - kubernetes.io/hostname
+  # - kubernetes.io/arch
+  # - kubernetes.io/os
+  # - node-role.kubernetes.io/<role> - master / worker
+  # - beta.kubernetes.io/instance-type (Cloud specific)
+  # - Custom labels
+  #     nodeAffinity:
+  #       required:
+  #         nodeSelectorTerms:
+  #         - matchExpressions:
+  #           - key: app-tier
+  #             operator: In
+  #             values:
+  #             - frontend
+  # then in CLI
+  #
+  #     kubectl label nodes <node-name> app-tier=frontend
+  #
+  # Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#binding
+  # 
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: todo-mysql-data-volume-claim
+spec:
+  # Selector is not supported with "local-path" - only dynamic allocation is supported
+  #  selector:
+  #    matchLabels:
+  #      type: todo-mysql-local-volume
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
