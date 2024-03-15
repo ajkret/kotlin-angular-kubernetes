@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+    // Check gradle.properties for version numbers
+
     //implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -26,14 +28,14 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core")
-    runtimeOnly("mysql:mysql-connector-java:8.0.33")
+    runtimeOnly("mysql:mysql-connector-java:${property("mysql-connector.version")}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     //testImplementation("org.springframework.security:spring-security-test")
     // Kotlin support for Mockito
-    testImplementation("org.mockito:mockito-core:5.10.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
-    //testImplementation("com.h2database:h2")
+    testImplementation("org.mockito:mockito-core:${property("mockito-core.version")}")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:${property("mockito-kotlin.version")}")
+    testImplementation("com.h2database:h2")
 }
 
 tasks.withType<KotlinCompile> {
@@ -45,4 +47,8 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.bootJar {
+    archiveFileName.set("application.jar")
 }

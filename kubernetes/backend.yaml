@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-list
+spec:
+  selector:
+    matchLabels:
+      app: todo-list
+  template:
+    metadata:
+      labels:
+        app: todo-list
+    spec:
+      containers:
+        - name: todo-list
+          image: kretz71/todo-backend:latest
+          # Image Pull Policy "IfNotPresent" will use the image from local repository
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
