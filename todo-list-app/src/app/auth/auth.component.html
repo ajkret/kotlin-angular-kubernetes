@@ -5,16 +5,16 @@
 
         <h3>Please, sign in</h3>
 
-        <form>
+        <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)">
           <div class="form-floating">
-            <input name="user" id="user" class="form-control col-xs-4">
+            <input name="user" id="user" class="form-control col-xs-4" ngModel required>
             <label for="user">User</label>
           </div>
           <div class="form-floating">
-            <input name="password" type="password" id="password" class="form-control col-xs-4">
+            <input name="password" type="password" id="password" class="form-control col-xs-4" ngModel required minlength="6">
             <label for="password">Password</label>
           </div>
-          <button class="btn btn-primary">Sign Up</button>
+          <button class="btn btn-primary" [disabled]="!authForm.valid">Sign Up</button>
         </form>
       </div>
     </div>
