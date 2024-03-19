@@ -22,7 +22,10 @@ spec:
           args: ["--default-authentication-plugin=mysql_native_password"]
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
           resources:
             limits:
               # It does not behave well below 2G

@@ -14,6 +14,7 @@ spec:
   stripPrefix:
     prefixes:
       - "/api"
+      - "/keycloak"
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -47,6 +48,16 @@ metadata:
     name: strip-api-prefix
 spec:
   rules:
+    - host: traefik.auth.localdev.me
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: keycloak-svc
+                port:
+                  number: 80
     - host: traefik.todo.localdev.me
       http:
         paths:
@@ -67,4 +78,5 @@ spec:
   tls:
     - hosts:
         - traefik.todo.localdev.me
+        - traefik.auth.localdev.me
       secretName: todo-tls-secret
