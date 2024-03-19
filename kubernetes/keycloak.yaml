@@ -1,3 +1,6 @@
+# This will enable keycloak in development mode for this demo.
+# Follow this page to configure the application
+# https://www.keycloak.org/getting-started/getting-started-docker
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,6 +15,7 @@ spec:
       labels:
         app: keycloak-app
     spec:
+      # https://www.keycloak.org/server/containers
       containers:
         - name: keycloak
           image: quay.io/keycloak/keycloak:latest
