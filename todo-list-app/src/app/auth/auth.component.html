@@ -1,17 +1,20 @@
 <div class="d-flex align-items-center justify-content-center vh-100">
-  <div class="w-100 form-signin" style="max-width: 400px;">
+  <div *ngIf="isLoading">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+  <div class="w-100 form-signin align-content-center" style="max-width: 400px; " *ngIf="!isLoading">
+    <div class="alert alert-danger" *ngIf="error">{{error}}</div>
     <div class="card">
       <div class="card-body">
-
         <h3>Please, sign in</h3>
-
         <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)">
           <div class="form-floating">
             <input name="user" id="user" class="form-control col-xs-4" ngModel required>
             <label for="user">User</label>
           </div>
           <div class="form-floating">
-            <input name="password" type="password" id="password" class="form-control col-xs-4" ngModel required minlength="6">
+            <input name="password" type="password" id="password" class="form-control col-xs-4" ngModel required
+              minlength="6">
             <label for="password">Password</label>
           </div>
           <button class="btn btn-primary" [disabled]="!authForm.valid">Sign Up</button>

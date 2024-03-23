@@ -34,7 +34,7 @@ spec:
           ports:
             - containerPort: 3306
           volumeMounts:
-            - mountPath: /data/mysql/data
+            - mountPath: /var/lib/mysql
               name: mysql-data
             - mountPath: /docker-entrypoint-initdb.d
               name: mysql-initdb

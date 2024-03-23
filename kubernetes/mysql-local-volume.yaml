@@ -1,6 +1,6 @@
 #
 # Create a volume for MYSQL - local-path means a volume in the Node, which is not recommended in Production
-# each Cloud Provider has its PersistentVolume implementation, which can be reached directly via 
+# each Cloud Provider has its PersistentVolume implementation, which can be reached directly via
 # PersistentVolumeClaim "storageClassName". Check options with:
 #
 #     kubectl get storageClass
@@ -13,7 +13,7 @@ metadata:
     type: todo-mysql-local-volume
 spec:
   capacity:
-    storage: 2001Mi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
@@ -23,7 +23,7 @@ spec:
     # Check your local Docker Desktop/Rancher Desktop VM or the absolute path visible for Kubernetes
     # In this case, it is the mouted drive D: visible on rancher-data VM
     # An alternative is use hostPath, which does not use PV an PVC
-    path: /mnt/d/kubernetes/todo-list/main
+    path: /mnt/d/kubernetes/todo-list/mysql/data
   # nodeAffinity is required, unfortunatelly. There are a few options for this:
   # - kubernetes.io/hostname
   # - kubernetes.io/arch
@@ -44,7 +44,7 @@ spec:
   #     kubectl label nodes <node-name> app-tier=frontend
   #
   # Ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#binding
-  # 
+  #
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -58,9 +58,9 @@ metadata:
   name: todo-mysql-data-volume-claim
 spec:
   # Selector is not supported with "local-path" - only dynamic allocation is supported
-  #  selector:
-  #    matchLabels:
-  #      type: todo-mysql-local-volume
+  selector:
+    matchLabels:
+      type: todo-mysql-local-volume
   accessModes:
     - ReadWriteOnce
   storageClassName: local-path
