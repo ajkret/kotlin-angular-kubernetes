@@ -6,6 +6,8 @@ databaseChangeLog:
       file: db/changelog/db.changelog-tables.yaml
   - include:
       file: db/changelog/db.changelog-user-username-index.yaml
+  - include:
+      file: db/changelog/db.changelog-user-cols-name-email.yaml
   - changeSet:
       id: create-db-and-user
       author: ajkret

@@ -10,7 +10,8 @@ import jakarta.persistence.Table
 @Entity
 @Table(
     indexes = [
-        Index(name = "idx_user_username", unique = true, columnList = "username")]
+        Index(name = "idx_user_username", unique = true, columnList = "username")
+    ]
 )
 class User {
     @Id
@@ -18,11 +19,15 @@ class User {
     var id: Int? = null
 
     var username: String
+    var name: String
+    var email: String
 
-    constructor() : this(username = "")
+    constructor() : this(username = "", name = "", email = "")
 
-    constructor(id: Int? = null, username: String) {
+    constructor(id: Int? = null, username: String, name: String, email: String) {
         this.id = id
         this.username = username
+        this.name = name
+        this.email = email
     }
 }

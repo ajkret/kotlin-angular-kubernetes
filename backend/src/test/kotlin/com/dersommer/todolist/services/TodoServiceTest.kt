@@ -28,7 +28,7 @@ class TodoServiceTest {
 
     @BeforeEach
     fun setUp() {
-        user = User(1, "test")
+        user = User(1, "test", "test", "test@test.com")
         completedTasks = listOf(
             Task(1, "Test", LocalDate.now().plusDays(2), false, user),
             Task(2, "Test 2", LocalDate.now().plusDays(1), true, user)

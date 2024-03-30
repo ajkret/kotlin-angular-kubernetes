@@ -14,7 +14,29 @@ spec:
   stripPrefix:
     prefixes:
       - "/api"
-      - "/keycloak"
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: cors-policy
+spec:
+  headers:
+    accessControlAllowMethods:
+      - "GET"
+      - "OPTIONS"
+      - "PUT"
+      - "POST"
+      - "PATCH"
+      - "DELETE"
+    accessControlAllowOriginList:
+      - "http://localhost:4200"
+      - "http://traefik.todo.localdev.me"
+      - "https://traefik.todo.localdev.me"
+    accessControlMaxAge: 100
+    addVaryHeader: true
+    accessControlAllowHeaders:
+      - "*"
+    accessControlAllowCredentials: true
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -31,6 +53,7 @@ spec:
         - name: todo-list-svc
           port: 80
       middlewares:
+        - name: cors-policy
         - name: strip-api-prefix
 ---
 apiVersion: networking.k8s.io/v1
@@ -45,7 +68,7 @@ metadata:
     # rule should apply, effectively controlling how and where traffic is received by Traefik for that particular Ingress.
     # web,websecure will make the Ingress accept http and https
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
-    name: strip-api-prefix
+    #name: strip-api-prefix
 spec:
   rules:
     - host: traefik.auth.localdev.me
@@ -68,13 +91,13 @@ spec:
                 name: todo-list-svc
                 port:
                   number: 80
-#          - pathType: Prefix
-#            path: /
-#            backend:
-#             service:
-#                name: tca-web
-#                port:
-#                  number: 80
+  #          - pathType: Prefix
+  #            path: /
+  #            backend:
+  #             service:
+  #                name: tca-web
+  #                port:
+  #                  number: 80
   tls:
     - hosts:
         - traefik.todo.localdev.me

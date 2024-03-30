@@ -1,17 +1,33 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from "@angular/common/http"
-import { Injectable } from "@angular/core"
-import { Observable, Subject, catchError, tap, throwError } from "rxjs"
-import { AuthenticationResponse, User } from "./types"
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http"
+import {Injectable} from "@angular/core"
+import {Observable, Subject, catchError, tap, throwError} from "rxjs"
 import * as jwt_decode from "jwt-decode"
+import {LoggedUser} from "../models/logger-user.model";
+import {UserService} from "../user/user.service";
+import {environment} from "../../environments/environment";
 
-@Injectable({ providedIn: 'root' })
+const LOCAL_STORAGE_AUTH_DATA_KEY = 'todo-list-app-user';
+
+interface AuthenticationResponse {
+  access_token: string,
+  expires_in: number,
+  refresh_expires_in: number,
+  refresh_token: string,
+  token_type: string,
+  'not-before-policy': number,
+  session_state: string,
+  scope: string
+}
+
+@Injectable({providedIn: 'root'})
 export class AuthService {
-  user = new Subject<User>();
+  authenticatedUser = new Subject<LoggedUser>();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private userService: UserService) {
+  }
 
-  // Error Handling
-  private processError(errorResponse: HttpErrorResponse) {
+  // Error Handling from http pipe()
+  private handleAuthenticationErrors(errorResponse: HttpErrorResponse) {
     console.log(errorResponse)
     switch (errorResponse.status) {
       case 401:
@@ -22,31 +38,54 @@ export class AuthService {
     return throwError(() => new Error('System error'));
   }
 
-  processLogin(data: AuthenticationResponse): void {
+  // Handle successful authentication - http.pipe()
+  private handleAuthentication(data: AuthenticationResponse): void {
     const tokenInfo = jwt_decode.jwtDecode(data.access_token)
     console.log(tokenInfo)
 
-    const user = new User(tokenInfo['preferred_username'], data.access_token, new Date(tokenInfo.exp*1000))
+    const user = new LoggedUser(tokenInfo['preferred_username'], data.access_token, new Date(tokenInfo.exp * 1000), tokenInfo)
     console.log(user)
-    this.user.next(user)
+
+    this.userService.updateUser(user)
+
+    // Propagate user info
+    this.authenticatedUser.next(user)
+
+    // Store data for auto-login
+    localStorage.setItem(LOCAL_STORAGE_AUTH_DATA_KEY, JSON.stringify(user));
   }
 
-  // Sign Up process - called from Form submit
-  signup(username: string, password: string): Observable<AuthenticationResponse> {
+  // Called from AppComponent OnInit() to load user from localStorage
+  autoSignin() {
+    const authData = localStorage.getItem(LOCAL_STORAGE_AUTH_DATA_KEY)
+    if (!authData) {
+      return
+    }
 
+    const user = JSON.parse(authData) as LoggedUser;
+    if (user.token)
+      this.authenticatedUser.next(user)
+  }
+
+  // Sign In process - called from Form submit
+  signIn(username: string, password: string): Observable<AuthenticationResponse> {
     const body = new HttpParams()
       .set('username', username)
       .set('password', password)
       .set('client_id', 'todo')
       .set('grant_type', 'password');
 
-    return this.http.post<AuthenticationResponse>('http://traefik.auth.localdev.me/realms/myrealm/protocol/openid-connect/token',
-      body.toString(),
-      {
-        headers: new HttpHeaders()
-          .set('Content-Type', 'application/x-www-form-urlencoded')
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded'
       })
-      .pipe(catchError(errorResponse => this.processError(errorResponse)),
-      tap(data => this.processLogin(data)));
+    }
+
+    // Fixed addresses aren't the ideal. Consider also mock data for development mode
+    return this.http.post<AuthenticationResponse>(environment.authenticationUrl, body.toString(), httpOptions)
+      .pipe(
+        catchError(errorResponse => this.handleAuthenticationErrors(errorResponse)),
+        tap(data => this.handleAuthentication(data))
+      )
   }
 }

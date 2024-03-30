@@ -23,7 +23,7 @@ export class AuthComponent {
     this.isLoading = true
 
     // Call external sign up
-    this.authService.signup(user, password).subscribe({
+    this.authService.signIn(user, password).subscribe({
       next: data => {
         console.log(data)
         this.isLoading = false
