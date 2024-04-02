@@ -5,6 +5,7 @@ import * as jwt_decode from "jwt-decode"
 import {LoggedUser} from "../models/logger-user.model";
 import {UserService} from "../user/user.service";
 import {environment} from "../../environments/environment";
+import {Router} from "@angular/router";
 
 export const LOCAL_STORAGE_AUTH_DATA_KEY = 'todo-list-app-user';
 
@@ -24,7 +25,7 @@ export class AuthService {
   authenticatedUser = new Subject<LoggedUser>();
   loggedUser:LoggedUser
 
-  constructor(private http: HttpClient, private userService: UserService) {
+  constructor(private http: HttpClient, private userService: UserService, private router:Router) {
   }
 
   // Error Handling from http pipe()
@@ -49,11 +50,12 @@ export class AuthService {
 
     // Store data for auto-login
     localStorage.setItem(LOCAL_STORAGE_AUTH_DATA_KEY, JSON.stringify(this.loggedUser));
+    this.authenticatedUser.next(this.loggedUser)
 
+    // Update the user - make sure this will be called after localStorage and Observable.next are called
     this.userService.updateUser(this.loggedUser)
 
-    // Propagate user info
-    this.authenticatedUser.next(this.loggedUser)
+    this.router.navigate(['/todo'])
   }
 
   // Called from AppComponent OnInit() to load user from localStorage
@@ -63,9 +65,10 @@ export class AuthService {
       return
     }
 
-    const user = JSON.parse(authData) as LoggedUser;
-    if (user.token)
+    const user = LoggedUser.fromJson(authData);
+    if (user.token) {
       this.authenticatedUser.next(user)
+    }
   }
 
   // Sign In process - called from Form submit
@@ -88,5 +91,10 @@ export class AuthService {
         catchError(errorResponse => this.handleAuthenticationErrors(errorResponse)),
         tap(data => this.handleAuthentication(data))
       )
+  }
+
+  signout() {
+    this.authenticatedUser.next(null)
+    localStorage.removeItem(LOCAL_STORAGE_AUTH_DATA_KEY)
   }
 }

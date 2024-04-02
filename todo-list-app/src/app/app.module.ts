@@ -10,13 +10,19 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { LoadingSpinnerComponent } from './shared/loading-spinner/loading-spinner.component';
 import { TaskListComponent } from './task/task-list/task-list.component';
 import {AuthInterceptorService} from "./auth/auth-interceptor.service";
+import { HeaderComponent } from './header/header.component';
+import { TodoComponent } from './todo/todo.component';
+import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthComponent,
     LoadingSpinnerComponent,
-    TaskListComponent
+    TaskListComponent,
+    HeaderComponent,
+    TodoComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,

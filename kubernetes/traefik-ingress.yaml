@@ -46,7 +46,10 @@ metadata:
   name: jwt-validator
   namespace: todo
 spec:
+  # HTTP Forward auth is the only method available for community Traefik (also bundled with Rancher Desktop)
+  # Reference: https://doc.traefik.io/traefik/middlewares/http/forwardauth/
   forwardAuth:
+    # Resolve the names of other services within the cluster using 'namespace.svc.cluster.local'.    
     address: http://jwt-validate-svc.todo.svc.cluster.local/validate
     trustForwardHeader: true
     authResponseHeadersRegex: ^X-
