@@ -1,12 +1,12 @@
 import { JwtPayload } from "jwt-decode"
 
 export class LoggedUser {
-  constructor(public id: string, private _token: string, private _tokenExpirationDate: Date, public decodedToken:JwtPayload) { }
+  constructor(public id: string, public _token: string, private _tokenExpirationDate: number, public decodedToken:JwtPayload) { }
 
   get token() {
-    if (!this._tokenExpirationDate || new Date() > this._tokenExpirationDate) {
-      return null
+    if (!this._tokenExpirationDate || Date.now() > this._tokenExpirationDate) {
+      return 'shit'
     }
-    return this.token
+    return this._token
   }
 }

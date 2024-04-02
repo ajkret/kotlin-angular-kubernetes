@@ -1,38 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: todo-list
+  name: jwt-validate
   namespace: todo
 spec:
   selector:
     matchLabels:
-      app: todo-list-app
+      app: jwt-validate-app
   template:
     metadata:
       labels:
-        app: todo-list-app
+        app: jwt-validate-app
     spec:
       containers:
-        - name: todo-list-container
-          image: kretz71/todo-backend:latest
+        - name: jwt-validate-app
+          image: kretz71/jwt-validator-service:latest
           # Image Pull Policy "IfNotPresent" will use the image from local repository
           # Production should use "Always"
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "128Mi"
+              cpu: "250m"
           ports:
-            - containerPort: 8080
+            - containerPort: 5000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: todo-list-svc
+  name: jwt-validate-svc
   namespace: todo
 spec:
   selector:
-    app: todo-list-app
+    app: jwt-validate-app
   ports:
-    - port: 80
-      targetPort: 8080
+  - port: 80
+    targetPort: 5000

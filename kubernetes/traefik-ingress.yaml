@@ -10,6 +10,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: strip-api-prefix
+  namespace: todo
 spec:
   stripPrefix:
     prefixes:
@@ -19,6 +20,7 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
   name: cors-policy
+  namespace: todo
 spec:
   headers:
     accessControlAllowMethods:
@@ -39,6 +41,17 @@ spec:
     accessControlAllowCredentials: true
 ---
 apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: jwt-validator
+  namespace: todo
+spec:
+  forwardAuth:
+    address: http://jwt-validate-svc.todo.svc.cluster.local/validate
+    trustForwardHeader: true
+    authResponseHeadersRegex: ^X-
+---
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: api-ingress-route
@@ -53,13 +66,15 @@ spec:
         - name: todo-list-svc
           port: 80
       middlewares:
-        - name: cors-policy
         - name: strip-api-prefix
+        - name: cors-policy
+        - name: jwt-validator
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: traefik-todo
+  namespace: todo
   annotations:
     # In Traefik v2, the annotation "traefik.ingress.kubernetes.io/router.entrypoints" is used within
     # Kubernetes Ingress resources to specify which entrypoints should be used by the router created
@@ -89,6 +104,16 @@ spec:
             backend:
               service:
                 name: todo-list-svc
+                port:
+                  number: 80
+    - host: host.docker.internal
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: jwt-validate-svc
                 port:
                   number: 80
   #          - pathType: Prefix

@@ -6,7 +6,7 @@ import {LoggedUser} from "../models/logger-user.model";
 import {UserService} from "../user/user.service";
 import {environment} from "../../environments/environment";
 
-const LOCAL_STORAGE_AUTH_DATA_KEY = 'todo-list-app-user';
+export const LOCAL_STORAGE_AUTH_DATA_KEY = 'todo-list-app-user';
 
 interface AuthenticationResponse {
   access_token: string,
@@ -22,6 +22,7 @@ interface AuthenticationResponse {
 @Injectable({providedIn: 'root'})
 export class AuthService {
   authenticatedUser = new Subject<LoggedUser>();
+  loggedUser:LoggedUser
 
   constructor(private http: HttpClient, private userService: UserService) {
   }
@@ -43,16 +44,16 @@ export class AuthService {
     const tokenInfo = jwt_decode.jwtDecode(data.access_token)
     console.log(tokenInfo)
 
-    const user = new LoggedUser(tokenInfo['preferred_username'], data.access_token, new Date(tokenInfo.exp * 1000), tokenInfo)
-    console.log(user)
-
-    this.userService.updateUser(user)
-
-    // Propagate user info
-    this.authenticatedUser.next(user)
+    this.loggedUser = new LoggedUser(tokenInfo['preferred_username'], data.access_token, tokenInfo.exp * 1000, tokenInfo)
+    console.log(this.loggedUser)
 
     // Store data for auto-login
-    localStorage.setItem(LOCAL_STORAGE_AUTH_DATA_KEY, JSON.stringify(user));
+    localStorage.setItem(LOCAL_STORAGE_AUTH_DATA_KEY, JSON.stringify(this.loggedUser));
+
+    this.userService.updateUser(this.loggedUser)
+
+    // Propagate user info
+    this.authenticatedUser.next(this.loggedUser)
   }
 
   // Called from AppComponent OnInit() to load user from localStorage
