@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <h3>Todo List</h3>
+      <!--
+      <form class="mb-3" (ngSubmit)="addTodo()">
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="New task" [(ngModel)]="newTask" name="task">
+          <input type="date" class="form-control" [(ngModel)]="newDueTo" name="dueTo">
+          <button class="btn btn-primary" type="submit">Add</button>
+        </div>
+      </form>
+      -->
+      <app-task-list></app-task-list>
+      <!--
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center"
+          *ngFor="let todo of todos; let i = index">
+          <div [class.text-decoration-line-through]="todo.completed">{{ todo.task }} - {{ todo.dueTo | date }}</div>
+          <input type="checkbox" [(ngModel)]="todo.completed" (change)="toggleCompleted(i)">
+        </li>
+      </ul>
+      -->
+
+    </div>
+  </div>
+</div>

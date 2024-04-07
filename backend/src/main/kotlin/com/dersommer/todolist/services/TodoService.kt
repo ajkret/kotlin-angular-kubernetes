@@ -6,19 +6,25 @@ import com.dersommer.todolist.repositories.TaskRepository
 import com.dersommer.todolist.repositories.UserRepository
 import com.dersommer.todolist.types.TaskData
 import org.springframework.stereotype.Service
+import java.util.*
 
-// TODO: when implementing TODOs by user, include userId
 /**
  * Business rules for recovering Tasks
  */
 @Service
 class TodoService(val repository: TaskRepository, val userRepository: UserRepository) {
-    fun retrieveTasks(userId: Int, includeCompleted: Boolean): List<Task> {
-        return if (includeCompleted) {
-            repository.findByUserId(userId)
-        } else {
-            repository.findByUserIdAndCompletedIsFalse(userId)
-        }
+    fun retrieveTasks(username: String, includeCompleted: Boolean): List<Task> {
+        // Find user Id by its username
+        val user = userRepository.findByUsername(username)
+
+        // Retrieve the list of tasks per user. Ignore invalid users
+        return user.map {
+            if (includeCompleted) {
+                repository.findByUserId(it.id ?: 0)
+            } else {
+                repository.findByUserIdAndCompletedIsFalse(it.id ?: 0)
+            }
+        }.orElse(listOf())
     }
 
     fun newTask(data: TaskData): Int {

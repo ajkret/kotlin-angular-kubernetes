@@ -1,19 +1,39 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TaskService} from "../task.service";
+import {Task} from "../../models/task.model";
+import {UserService} from "../../user/user.service";
+import {AuthService} from "../../auth/auth.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-task-list',
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.css'
 })
-export class TaskListComponent {
-  newTask:string
-  newDueTo:Date
+export class TaskListComponent implements OnInit {
+  tasks: Task[] = [];
 
-  addTodo() {
-    
+  constructor(private authService: AuthService, private taskService: TaskService) {
+  }
+
+  ngOnInit() {
+    this.loadTasks()
+  }
+
+  loadTasks() {
+    this.taskService.refreshTaskListForUser().subscribe({
+      next: (tasks) => {
+        this.tasks = tasks;
+      },
+      error: (err) => console.error('Failed to get tasks', err)
+    });
+  }
+
+  refreshTasks() {
+    this.loadTasks();  // Reuse the loadTasks method to refresh the task list
   }
 
   toggleCompleted(i: number) {
-    
+
   }
 }

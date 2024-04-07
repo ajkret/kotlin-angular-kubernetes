@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.*
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
@@ -38,6 +37,8 @@ class TodoServiceTest {
         repo = mock<TaskRepository>()
         userRepo = mock<UserRepository>()
 
+        whenever(userRepo.findByUsername(anyString())).thenReturn(Optional.of(user))
+
         // I didn't understand why org.mockito.kotlin.any() didn't inferred the correct class
         whenever(repo.save(any(Task::class.java))).then { param ->
             val data: Task = param.getArgument(0) as Task
@@ -61,7 +62,7 @@ class TodoServiceTest {
 
     @Test
     fun `Should return open Tasks`() {
-        val result = service.retrieveTasks(user.id ?: 1, false)
+        val result = service.retrieveTasks(user.username, false)
         assertNotNull(result)
         assertEquals(1, result.size)
         assertFalse(result[0].completed)
@@ -69,7 +70,7 @@ class TodoServiceTest {
 
     @Test
     fun `Should return open and completed Tasks`() {
-        val result = service.retrieveTasks(user.id ?: 1, true)
+        val result = service.retrieveTasks(user.username, true)
         assertNotNull(result)
         assertEquals(2, result.size)
     }

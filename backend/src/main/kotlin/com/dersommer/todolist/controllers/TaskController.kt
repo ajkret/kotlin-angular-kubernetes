@@ -19,10 +19,10 @@ class TaskController(val service: TodoService) {
 
     @GetMapping
     fun listAllUserTasks(
-        @RequestParam("id") userId: Int,
+        @RequestParam("username") username: String,
         @RequestParam("completed") includeCompleted: Boolean = false
     ): List<TaskData> {
-        return service.retrieveTasks(userId, includeCompleted)
+        return service.retrieveTasks(username, includeCompleted)
             .stream()
             .map { item -> TaskData(item.id, item.task, item.dueTo, item.completed, item.user?.id ?: 0) }
             .collect(Collectors.toList())
