@@ -1,16 +1,14 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <h3>Todo List</h3>
-      <!--
+      <h3>Add a new task</h3>
       <form class="mb-3" (ngSubmit)="addTodo()">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="New task" [(ngModel)]="newTask" name="task">
-          <input type="date" class="form-control" [(ngModel)]="newDueTo" name="dueTo">
+          <input type="text" class="form-control" placeholder="New task" [(ngModel)]="newTask" name="task" id="name">
+          <input type="date" class="form-control" placeholder="Due To" [(ngModel)]="newDueTo" name="dueTo" id="dueTo">
           <button class="btn btn-primary" type="submit">Add</button>
         </div>
       </form>
-      -->
       <app-task-list></app-task-list>
       <!--
       <ul class="list-group">
