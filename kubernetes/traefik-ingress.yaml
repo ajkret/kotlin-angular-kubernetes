@@ -109,16 +109,16 @@ spec:
                 name: todo-list-svc
                 port:
                   number: 80
-    - host: host.docker.internal
-      http:
-        paths:
-          - pathType: Prefix
-            path: /
-            backend:
-              service:
-                name: jwt-validate-svc
-                port:
-                  number: 80
+#    - host: host.docker.internal
+#      http:
+#       paths:
+#          - pathType: Prefix
+#            path: /
+#            backend:
+#              service:
+#                name: jwt-validate-svc
+#                port:
+#                  number: 80
   #          - pathType: Prefix
   #            path: /
   #            backend:
