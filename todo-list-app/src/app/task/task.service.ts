@@ -1,8 +1,5 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {UserService} from "../user/user.service";
-import {LoggedUser} from "../models/logger-user.model";
-import {User} from "../models/user.model";
 import {environment} from "../../environments/environment";
 import {map, Observable, throwError} from "rxjs";
 import {Task} from "../models/task.model";
@@ -28,5 +25,20 @@ export class TaskService {
           dueTo: new Date(task.dueTo)  // Convert the date string to a Date object
         })))
       )
+  }
+
+  addNewTask(newTask: string, dueTo: string) {
+    const options = {
+      headers: new HttpHeaders()
+        .set('Content-Type', 'application/json')
+    }
+
+    const body = {
+      task: newTask,
+      dueTo: new Date(dueTo).toISOString(),
+      completed: "false",
+      userId: this.authService.userId
+    }
+    return this.http.post<number>(`${environment.apiUrl}/todo`, body, options)
   }
 }

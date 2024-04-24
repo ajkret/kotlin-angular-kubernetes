@@ -31,9 +31,10 @@ spec:
       - "PATCH"
       - "DELETE"
     accessControlAllowOriginList:
-      - "http://localhost:4200"
-      - "http://traefik.todo.localdev.me"
-      - "https://traefik.todo.localdev.me"
+       - "*"
+#      - "http://localhost:4200"
+#      - "http://traefik.todo.localdev.me"
+#      - "https://traefik.todo.localdev.me"
     accessControlMaxAge: 100
     addVaryHeader: true
     accessControlAllowHeaders:

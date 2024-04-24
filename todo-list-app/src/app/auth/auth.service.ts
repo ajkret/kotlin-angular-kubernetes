@@ -3,9 +3,9 @@ import {Injectable} from "@angular/core"
 import {Observable, Subject, catchError, tap, throwError} from "rxjs"
 import * as jwt_decode from "jwt-decode"
 import {LoggedUser} from "../models/logger-user.model";
-import {UserService} from "../user/user.service";
 import {environment} from "../../environments/environment";
 import {Router} from "@angular/router";
+import {User} from "../models/user.model";
 
 export const LOCAL_STORAGE_AUTH_DATA_KEY = 'todo-list-app-user';
 
@@ -24,8 +24,9 @@ interface AuthenticationResponse {
 export class AuthService {
   authenticatedUser = new Subject<LoggedUser>();
   loggedUser:LoggedUser
+  userId: number;
 
-  constructor(private http: HttpClient, private userService: UserService, private router:Router) {
+  constructor(private http: HttpClient, private router:Router) {
   }
 
   // Error Handling from http pipe()
@@ -53,7 +54,7 @@ export class AuthService {
     this.authenticatedUser.next(this.loggedUser)
 
     // Update the user - make sure this will be called after localStorage and Observable.next are called
-    this.userService.updateUser(this.loggedUser)
+    this.updateUser(this.loggedUser)
 
     this.router.navigate(['/todo'])
   }
@@ -96,5 +97,21 @@ export class AuthService {
   signout() {
     this.authenticatedUser.next(null)
     localStorage.removeItem(LOCAL_STORAGE_AUTH_DATA_KEY)
+  }
+
+  updateUser(loggedUser: LoggedUser) {
+    const body = new User(loggedUser.id, loggedUser.decodedToken['name'], loggedUser.decodedToken['email']);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    };
+
+    // Fixed addresses aren't the ideal. Consider also mock data for development mode
+    return this.http.post<number>(`${environment.apiUrl}/user`, body, httpOptions)
+      .subscribe({
+        next: data => this.userId = data,
+        error:_errorResponse => throwError(() => new Error('Could not update User'))
+      })
   }
 }

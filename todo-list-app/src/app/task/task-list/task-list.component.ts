@@ -1,9 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TaskService} from "../task.service";
 import {Task} from "../../models/task.model";
-import {UserService} from "../../user/user.service";
 import {AuthService} from "../../auth/auth.service";
-import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-task-list',
