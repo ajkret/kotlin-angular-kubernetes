@@ -23,10 +23,10 @@ interface AuthenticationResponse {
 @Injectable({providedIn: 'root'})
 export class AuthService {
   authenticatedUser = new Subject<LoggedUser>();
-  loggedUser:LoggedUser
+  loggedUser: LoggedUser
   userId: number;
 
-  constructor(private http: HttpClient, private router:Router) {
+  constructor(private http: HttpClient, private router: Router) {
   }
 
   // Error Handling from http pipe()
@@ -62,14 +62,15 @@ export class AuthService {
   // Called from AppComponent OnInit() to load user from localStorage
   autoSignin() {
     const authData = localStorage.getItem(LOCAL_STORAGE_AUTH_DATA_KEY)
-    if (!authData) {
-      return
+    if (authData) {
+      const user = LoggedUser.fromJson(authData);
+      if (user.token) {
+        this.loggedUser = user
+        this.authenticatedUser.next(user)
+        return
+      }
     }
-
-    const user = LoggedUser.fromJson(authData);
-    if (user.token) {
-      this.authenticatedUser.next(user)
-    }
+    this.router.navigate(['/auth'])
   }
 
   // Sign In process - called from Form submit
@@ -111,7 +112,11 @@ export class AuthService {
     return this.http.post<number>(`${environment.apiUrl}/user`, body, httpOptions)
       .subscribe({
         next: data => this.userId = data,
-        error:_errorResponse => throwError(() => new Error('Could not update User'))
+        error: _errorResponse => throwError(() => new Error('Could not update User'))
       })
+  }
+
+  isAuthenticated() {
+    return this.loggedUser && this.loggedUser.token;
   }
 }

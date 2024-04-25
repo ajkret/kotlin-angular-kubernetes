@@ -20,6 +20,7 @@ export function CreateAuthGuard(): CanActivateFn {
         return true;
       }
     }
-    return router.createUrlTree(['/auth'])
+    router.navigate(['/auth'])
+    return false;
   }
 }

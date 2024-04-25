@@ -7,10 +7,10 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item" *ngIf="!isAuthenticated">
+        <li class="nav-item" *ngIf="!isAuthenticated()">
           <a class="nav-link" routerLink="/auth">Sign In</a>
         </li>
-        <li class="nav-item" *ngIf="isAuthenticated">
+        <li class="nav-item" *ngIf="isAuthenticated()">
           <a class="nav-link" href="#" (click)="logout()">Sign Out</a>
         </li>
       </ul>

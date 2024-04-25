@@ -10,24 +10,17 @@ import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  isAuthenticated = false
   showHeader = true
-  private subscription: Subscription
   private navigationSubscription: Subscription;
 
   constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe()
     this.navigationSubscription.unsubscribe()
   }
 
   ngOnInit() {
-    this.subscription = this.authService.authenticatedUser.subscribe(
-      loggedUser => this.isAuthenticated = !!loggedUser && !!loggedUser.token
-    )
-
     this.navigationSubscription = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => this.route),
@@ -46,5 +39,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
   logout() {
     this.authService.signout()
     this.router.navigate(['/auth'])
+  }
+
+  isAuthenticated() {
+    return this.authService.isAuthenticated();
   }
 }
