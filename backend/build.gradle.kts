@@ -28,7 +28,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     runtimeOnly("mysql:mysql-connector-java:${property("mysql-connector.version")}")
+
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     //testImplementation("org.springframework.security:spring-security-test")

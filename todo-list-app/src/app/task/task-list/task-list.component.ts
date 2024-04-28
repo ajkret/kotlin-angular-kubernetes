@@ -33,5 +33,6 @@ export class TaskListComponent implements OnInit {
 
   toggleCompleted(i: number) {
 
+
   }
 }

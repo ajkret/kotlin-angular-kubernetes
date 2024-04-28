@@ -9,6 +9,11 @@ import {AuthService} from "../auth/auth.service";
 export class TaskService {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
+  private convertDate(dateAsString:string) {
+    const [year, month, day] = dateAsString.split('-').map(num => parseInt(num, 10))
+    return new Date(year, month, day)
+  }
+
   refreshTaskListForUser(): Observable<Task[]> {
     const options = {
       headers: new HttpHeaders()
@@ -22,7 +27,7 @@ export class TaskService {
       .pipe(
         map(tasks => tasks.map(task => ({
           ...task,
-          dueTo: new Date(task.dueTo)  // Convert the date string to a Date object
+          dueTo: this.convertDate(task.dueTo as unknown as string)
         })))
       )
   }
